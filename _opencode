@@ -1,0 +1,41 @@
+#compdef opencode
+
+# Completa dinámicamente los modelos disponibles (opencode models)
+_opencode__list_models() {
+  local -a models
+  models=(${(f)"$(command opencode models 2>/dev/null)"})
+  _describe 'model' models
+}
+
+_opencode_yargs_completions()
+{
+  local reply
+  local si=$IFS
+  if [[ $words[$CURRENT-1] == "--model" || $words[$CURRENT-1] == "-m" ]]; then
+    _opencode__list_models
+    return
+  fi
+  if [[ $PREFIX == "--model="* ]]; then
+    local base="${PREFIX#--model=}"
+    reply=(${(M)${(f)"$(command opencode models 2>/dev/null)"}:#${base}*})
+    if [[ ${#reply} -gt 0 ]]; then
+      _describe 'model' reply
+    fi
+    return
+  fi
+  IFS=$'
+' reply=($(COMP_CWORD="$((CURRENT-1))" COMP_LINE="$BUFFER" COMP_POINT="$CURSOR" opencode --get-yargs-completions "${words[@]}"))
+  IFS=$si
+  if [[ ${#reply} -gt 0 ]]; then
+    _describe 'values' reply
+  else
+    _default
+  fi
+}
+
+_opencode()
+{
+  _opencode_yargs_completions "$@"
+}
+
+_opencode "$@"
