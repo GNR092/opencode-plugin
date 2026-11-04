@@ -1,10 +1,10 @@
-# OpenCode Plugin for Oh My Zsh
+# Plugin de OpenCode V2 para Oh My Zsh
 
-Plugin de Oh My Zsh que integra **OpenCode** (agente de codificación en terminal) con completaciones de Zsh.
+Plugin de Oh My Zsh que añade completaciones de Zsh para la CLI de **OpenCode V2**.
 
 ## Requisitos
 
-- [OpenCode](https://opencode.ai/) instalado
+- [OpenCode V2](https://opencode.ai/v2/docs/cli/) instalado y disponible en `$PATH`
 - [Oh My Zsh](https://ohmyz.sh/) instalado
 
 ## Instalación
@@ -49,24 +49,30 @@ source ~/.zshrc
 
 ## Qué hace este plugin
 
-1. **Verifica que OpenCode esté instalado** - Muestra advertencia si no lo está
-2. **Carga completaciones automáticas** - Generadas oficialmente por la CLI (`opencode completion zsh`) con una mejora: completa dinámicamente los modelos en `--model`/`-m`
+1. **Verifica que OpenCode esté instalado** - Muestra una advertencia si no lo está.
+2. **Carga completaciones nativas de Zsh** - `_opencode` se genera con `opencode --completions zsh` y cubre los comandos, subcomandos y flags de la CLI instalada.
+3. **Sugiere modelos dinámicamente** - `--model`, `-m` y `--model=<prefijo>` consultan `opencode models`.
 
 ## Completaciones disponibles
 
-Al escribir `opencode <TAB>` obtienes:
+El archivo incluido se generó con OpenCode **v2.2.5**. Sus comandos principales son:
 
-- Comandos: `completion`, `acp`, `mcp`, `run`, `debug`, `providers`, `agent`, `upgrade`, `uninstall`, `serve`, `web`, `models`, `stats`, `export`, `import`, `github`, `pr`, `session`, `plugin`, `db`
-- Flags globales y por comando (`--model`, `--session`, `--agent`, `--auto`, `--mini`, etc.)
-- **Modelos disponibles** (dinámico vía `opencode models`) en: `--model`, `-m`, `--model=<prefijo>`
-- Completaciones dinámicas generadas por la propia CLI en tiempo de ejecución
+- Comandos: `upgrade` (`update`), `uninstall`, `acp`, `api`, `debug`, `auth`, `mcp`, `plugin`, `models`, `stats`, `mini`, `run`, `session`, `service`, `reload`, `pair`, `serve`.
+- Subcomandos:
+  - `auth`: `list`, `login`, `logout`, `export`, `import`, `switch`.
+  - `debug`: `agents`, `config`, `heap-dump`, `paths`.
+  - `mcp`: `list`, `add`, `auth`, `logout`.
+  - `plugin`: `list`, `add`, `check`, `update`, `remove`.
+  - `session`: `list`, `delete`, `export`, `import`.
+  - `service`: `start`, `restart`, `status`, `stop`, `get`, `set`, `unset`.
+- Flags globales y de cada comando, según la versión instalada. `--completions` es una opción global, no un subcomando.
 
 ## Estructura
 
 ```
 opencode/
 ├── opencode.plugin.zsh    # Plugin principal (carga completions)
-├── _opencode              # Completaciones oficiales de Zsh (yargs)
+├── _opencode              # Completaciones nativas de OpenCode V2 para Zsh
 └── README.md              # Este archivo
 ```
 
@@ -81,13 +87,16 @@ rm -f ~/.zcompdump*
 exec zsh
 ```
 
-### Completaciones desactualizadas
+### Actualizar las completaciones
 
-El script de completación se genera desde la versión instalada de opencode:
+Regenera el archivo con la CLI V2 instalada:
 
 ```bash
-opencode completion zsh > ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/opencode/_opencode
+completion_file="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/opencode/_opencode"
+opencode --completions zsh > "$completion_file"
 ```
+
+La CLI genera la base estática; al regenerarla, conserva el bloque `Custom model completion` al inicio de `_opencode` para mantener las sugerencias dinámicas de modelos.
 
 ## Actualizar
 
@@ -99,4 +108,4 @@ source ~/.zshrc
 
 ## Licencia
 
-MIT - Basado en las completaciones oficiales de OpenCode (yargs)
+MIT - Basado en el generador nativo de completaciones de OpenCode V2.
